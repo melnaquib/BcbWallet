@@ -5,10 +5,10 @@ import QtQuick.Controls.Material 2.3
 
 
 Drawer {
-    id: drawer
+    id: sidePanel
 
-//    property string account: accsList.currentItem.pubk
-    property string account: ""
+    property string account: accsList.model ? accsList.currentItem.account : ""
+    property var accs
 
     property bool isPortrait: false
 
@@ -17,6 +17,7 @@ Drawer {
     position: isPortrait ? 0 : 1
     visible: !isPortrait
 
+    property alias settingsSelected: settingsBtn.checked
 
     ColumnLayout {
         id: walletsLayout
@@ -34,13 +35,12 @@ Drawer {
 
         ListView {
             id: accsList
-            model: accs.length
+//            model: accs.length
             width: parent.width
             keyNavigationWraps: true
             interactive: true
             boundsBehavior: Flickable.StopAtBounds
             spacing: 5
-
             focus: true
 
 //                height: 400
@@ -73,6 +73,8 @@ Drawer {
 //                    anchors.fill: parent
                 height: childrenRect.height
                 width: parent.width
+                anchors.margins: 5
+                property string account: accs[index]["account"]
                 onClicked: {
                     accsList.currentIndex = index;
                 }
@@ -80,14 +82,18 @@ Drawer {
 
                     ColumnLayout {
     //                anchors.fill: parent
-                    property string pubk: accs[index]["name"]
-    //                property alias pubk: accs[index]["name"]
+                    anchors.leftMargin: 5
+                    anchors.rightMargin: 5
                     width: parent.width
                     Label {
                         text: accs[index]["name"]
+                        Layout.leftMargin: 5
+                        Layout.rightMargin: 5
                     }
                     Label {
                         text: accs[index]["balance"]
+                        Layout.leftMargin: 5
+                        Layout.rightMargin: 5
                     }
 
                 }
@@ -101,11 +107,13 @@ Drawer {
             Layout.fillWidth: true
         }
         Button {
+            id: settingsBtn
             text: "Settings"
             icon.source: "icons/options.png"
             flat: true
             Layout.alignment: Qt.AlignBottom
             Layout.fillWidth: true
+            checkable: true
         }
         Button {
             text: "Log out"
@@ -113,8 +121,15 @@ Drawer {
             Layout.alignment: Qt.AlignBottom
             flat: true
             Layout.fillWidth: true
+            onClicked: Qt.quit()
         }
 
+    }
+
+    function load(accs) {
+        sidePanel.accs = accs;
+        accsList.model = 0;
+        accsList.model = accs.length;
     }
 }
 

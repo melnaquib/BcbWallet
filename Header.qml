@@ -8,12 +8,17 @@ import Qt.labs.settings 1.0
 //    anchors.fill: parent
 
 ToolBar {
+    id: header
     //        height: btnRecv.implicitHeight
     height: accountInfo.implicitHeight
 //    anchors.leftMargin: 5 + !inPortrait ? drawer.width : undefined
 
+    property string name: ""
+    property int balance: 0
+
 RowLayout {
     anchors.fill: parent
+
 
     HeaderButton {
         id: btnRecv
@@ -28,17 +33,17 @@ RowLayout {
 //        anchors.centerIn: parent
 
         Label {
-            text: accs[currAccIdx]["name"]
+            text: name
             Layout.alignment: Qt.AlignHCenter
         }
         Label {
-            text: accs[currAccIdx]["balance"] + " " + accs[currAccIdx]["uint"] + "i"
+            text: balance + " B"
             Layout.alignment: Qt.AlignHCenter
         }
-        Label {
-            text: "254.99$"
-            Layout.alignment: Qt.AlignHCenter
-        }
+//        Label {
+//            text: "254.99$"
+//            Layout.alignment: Qt.AlignHCenter
+//        }
     }
 
     HeaderButton {
@@ -48,6 +53,10 @@ RowLayout {
 //        anchors.left: parent.left
     }
 
+}
+
+function loadAcc(acc) {
+    if(! acc) acc = {};
 }
 
 }

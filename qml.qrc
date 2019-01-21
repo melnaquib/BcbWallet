@@ -2,8 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>HomeForm.ui.qml</file>
-        <file>Page1Form.ui.qml</file>
-        <file>Page2Form.ui.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>MainWin.qml</file>
         <file>Test.qml</file>
@@ -15,5 +13,6 @@
         <file>Header.qml</file>
         <file>SidePanel.qml</file>
         <file>SendDialog.qml</file>
+        <file>SettingsPage.qml</file>
     </qresource>
 </RCC>

@@ -11,9 +11,7 @@ Page {
 
 //    property alias style: Material
 
-    property string account: Accs.a_GA
-
-    property var txs: Rpc.account_history(account)
+    property var txs
 
     header: RowLayout {
         height: tfTxSearch.implicitHeight
@@ -27,7 +25,7 @@ Page {
     }
 
     ListView {
-        id: listView
+        id: txsListView
         model: txs.length
         anchors.fill: parent
         spacing: 5
@@ -60,7 +58,7 @@ Page {
                 color: Material.foreground
             }
             Label {
-                text: listView.getTxDescr(receive, tx["binding"])
+                text: txsListView.getTxDescr(receive, tx["binding"])
                 color: "white"
             }
             Label {
@@ -68,6 +66,14 @@ Page {
                 color: Material.foreground
             }
         }
+    }
+
+    function loadAcc(acc) {
+        if(! acc) acc = "";
+        txs = Rpc.account_history(acc);
+        txsListView.model = 0;
+        txsListView.model = txs.length;
+
     }
 
 }

@@ -17,7 +17,27 @@ function _rpc(args, cb){
     return res;
 }
 
+function walletAccounts(wallet) {
+    console.log("DBG01");
+    console.log(wallet);
+
+    var args = {
+        action: "wallet_balances",
+        wallet: wallet
+    }
+    var rsp = _rpc(args);
+    var res = [];
+    for(var a in rsp.balances) {
+        var o = rsp.balances[a];
+        o.account = a;
+        o.name = a;
+        res.push(o);
+    }
+    return res;
+}
+
 function account_history(account) {
+    if (! account) return [];
     var args = {
         action: "account_history",
         count: "-1",
@@ -25,6 +45,26 @@ function account_history(account) {
     }
 
     var res = _rpc(args);
+    console.log("H");
+
+    res = res.history;
+    for(var i in res) {
+        res[i].binding = true;
+        res[i].date = "date";
+    }
+    return res;
+}
+
+function account_pending(account) {
+    if (! account) return [];
+    var args = {
+        action: "accounts_pending",
+        accounts: [account]
+    }
+
+    var rsp = _rpc(args);
+    rsp = rsp;
+
     res = res.history;
     for(var i in res) {
         res[i].binding = true;
@@ -42,20 +82,4 @@ function send(account, amount) {
     }
 
     var res = _rpc(args);
-}
-
-function walletAccounts(wallet) {
-    var args = {
-        action: "wallet_balances",
-        wallet: wallet
-    }
-    var rsp = _rpc(args);
-    var res = [];
-    for(var a in rsp.balances) {
-        var o = rsp.balances[a];
-        o.account = a;
-        o.name = a;
-        res.push(o);
-    }
-    return res;
 }

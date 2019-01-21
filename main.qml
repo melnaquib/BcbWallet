@@ -11,17 +11,19 @@ ApplicationWindow {
     visible: true
     width: 800
     height: 600
-//    title: qsTr("Stack")
     readonly property bool isPortrait: mainWin.width < mainWin.height
-
-    property alias wallet: walletTf.text
-
-
     property int spacing: 5
 
-//    property var style: Material
+    property real cvrt: .1 //bcb to usd
 
-    property real cvrt: .1
+    property string wallet: settings.wallet
+    property alias themeLight: settings.light
+
+    Material.theme: themeLight ? Material.Light : Material.Dark
+    Material.accent: themeLight ? "#0688c9" : "yellow"
+    Material.background: themeLight ? "#e6e6e6" : "#212121"
+    Material.foreground: Material.accent
+    Material.primary: themeLight ? "#f9f9f9" : "#000000"
 
     property int currAccIdx: 1
 //    property var accs: [{
@@ -33,9 +35,11 @@ ApplicationWindow {
 //        }]
 
 
-    property var accs: Rpc.walletAccounts(wallet);
-
-    Material.theme: day.checked ? Material.Light : Material.Dark
+    property var accs
+    onWalletChanged: {
+        accs = Rpc.walletAccounts(wallet);
+        sidePanel.load(accs);
+    }
 
     RowLayout {
         z:1
@@ -59,8 +63,10 @@ ApplicationWindow {
 
 
     header: Header {
+        id: accHeader
         x: sidePanel.width
         width: parent.width - sidePanel.width
+
     }
 
     SidePanel {
@@ -69,6 +75,10 @@ ApplicationWindow {
         width: mainWin.width * 0.3
         height: mainWin.height
 
+        onAccountChanged: {
+            accHeader.loadAcc(account);
+            txsPage.loadAcc(account);
+        }
     }
 
     StackView {
@@ -77,30 +87,27 @@ ApplicationWindow {
          anchors.leftMargin: 5 + !isPortrait ? sidePanel.width : undefined
 
 //        initialItem: "HomeForm.ui.qml"
-        initialItem: Txs {
+        initialItem: sidePanel.settingsSelected ? settingsPage : txsPage
+
+        Txs {
+            id: txsPage
             padding: 10
+//            account: sidePanel.account
+            visible: !sidePanel.settingsSelected
+        }
+
+        SettingsPage {
+            id: settingsPage
+            wallet: "884F248258C9EB8843F88AA25A261DEC7F16491F7FCE5CCB69126112ED28253C"
+            visible: sidePanel.settingsSelected
+
         }
 
         anchors.fill: parent
     }
 
-    Dialog {
-        id: walletDlg
-        title: qsTr("Wallet")
-        anchors.centerIn: parent
-
-        standardButtons: Dialog.Ok
-
-        contentItem: TextField {
-            id: walletTf
-            anchors.centerIn: parent
-            placeholderText: "Wallet"
-            text: "884F248258C9EB8843F88AA25A261DEC7F16491F7FCE5CCB69126112ED28253C"
-        }
-    }
-
-    Settings {
-        property alias wallet: mainWin.wallet
-        property alias dayChecked: day.checked
+    Settings {id: settings
+        property alias wallet: settingsPage.wallet
+        property alias light: settingsPage.light
     }
 }
