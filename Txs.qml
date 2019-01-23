@@ -10,6 +10,7 @@ import "rpc.js" as Rpc
 Page {
 
 //    property alias style: Material
+    background: Item{}
 
     property var txs
 

@@ -8,6 +8,7 @@ Page {
 
     property alias light: lightCb.checked
     property alias wallet: walletTf.text
+    background: Item{}
 
     GridLayout {
         columns: 1

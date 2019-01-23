@@ -110,4 +110,9 @@ ApplicationWindow {
         property alias wallet: settingsPage.wallet
         property alias light: settingsPage.light
     }
+
+    background: Image {
+        id: bg
+        source: "images/bg.png"
+    }
 }

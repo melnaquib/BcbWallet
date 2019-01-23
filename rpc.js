@@ -59,7 +59,8 @@ function account_pending(account) {
     if (! account) return [];
     var args = {
         action: "accounts_pending",
-        accounts: [account]
+        accounts: [account],
+        source: "true"
     }
 
     var rsp = _rpc(args);

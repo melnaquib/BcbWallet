@@ -16,9 +16,10 @@ ToolBar {
     property string name: ""
     property int balance: 0
 
+    background: Item{}
+
 RowLayout {
     anchors.fill: parent
-
 
     HeaderButton {
         id: btnRecv
