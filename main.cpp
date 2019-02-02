@@ -1,7 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
+#include <QQmlContext>
 #include "vendor.h"
+#include "uiproxy.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,6 +18,10 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(VENDOR_APP_VER);
 
     QQmlApplicationEngine engine;
+
+    UiProxy proxy;
+    engine.rootContext()->setContextProperty("proxy", &proxy);
+
 //    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     engine.load(QUrl(QStringLiteral("../BcbWallet/main.qml")));
     if (engine.rootObjects().isEmpty())

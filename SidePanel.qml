@@ -3,9 +3,16 @@ import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
 import QtQuick.Controls.Material 2.3
 
+import "fmt.js" as Fmt
+
 
 Drawer {
     id: sidePanel
+
+    background: Rectangle {color: "black"}
+
+    property bool light: Material.Light == Material.theme
+    property color iconColor: light ? "black" : "white"
 
     property string account: accsList.model ? accsList.currentItem.account : ""
     property var accs
@@ -22,24 +29,38 @@ Drawer {
     ColumnLayout {
         id: walletsLayout
         anchors.fill: parent
-        anchors.margins: 10
+        anchors.margins: 20
 
         Image {
             id: logo
-            source: "icons/logo.png"
+            source: "images/icons/logo.png"
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             Layout.preferredWidth: parent.width / 2
             Layout.preferredHeight: width
 //            Rectangle {anchors.fill: parent;  radius: 20; color: "red"}
+            scale: 0.7
+
+            fillMode: Image.PreserveAspectFit
+        }
+
+        Label {
+            text: "bitcoin black"
+            color: "white"
+            font.italic: true
+            font.bold: true
+            Layout.margins: 20
+            Layout.alignment: Qt.AlignHCenter
+
+            scale: parent.width / 1.4 / width
+
         }
 
         ListView {
             id: accsList
 //            model: accs.length
-            width: parent.width
+
             keyNavigationWraps: true
             interactive: true
-            boundsBehavior: Flickable.StopAtBounds
             spacing: 5
             focus: true
 
@@ -47,6 +68,7 @@ Drawer {
 //                height: implicitHeight
 //            Layout.fillHeight: true
             Layout.fillHeight: true
+            Layout.fillWidth: true
 
             highlightFollowsCurrentItem: true
             highlightMoveDuration : 1000
@@ -72,8 +94,9 @@ Drawer {
 //                    z:1
 //                    anchors.fill: parent
                 height: childrenRect.height
-                width: parent.width
+                width: parent.width + 20
                 anchors.margins: 5
+                anchors.rightMargin: -20
                 property string account: accs[index]["account"]
                 onClicked: {
                     accsList.currentIndex = index;
@@ -83,47 +106,62 @@ Drawer {
                     ColumnLayout {
     //                anchors.fill: parent
                     anchors.leftMargin: 5
-                    anchors.rightMargin: 5
+                    anchors.rightMargin: 0
                     width: parent.width
                     Label {
                         text: accs[index]["name"]
                         Layout.leftMargin: 5
-                        Layout.rightMargin: 5
+                        Layout.rightMargin: 0
                     }
                     Label {
-                        text: accs[index]["balance"]
+                        text: Fmt.fmt(accs[index]["balance"])
                         Layout.leftMargin: 5
-                        Layout.rightMargin: 5
+                        Layout.rightMargin: 0
+                        color: iconColor
                     }
 
                 }
             }
+            onCurrentIndexChanged: {
+                account = accsList.model ? accsList.currentItem.account : "";
+            }
         }
 
-        Button {
-            text: "+ Add new account"
-            flat: true
-            Layout.alignment: Qt.AlignTop
-            Layout.fillWidth: true
-        }
+//        Button {
+//            text: "+ Add new account"
+//            flat: true
+//            Layout.alignment: Qt.AlignTop
+//            Layout.fillWidth: true
+//            icon.color: iconColor
+//        }
         Button {
             id: settingsBtn
             text: "Settings"
-            icon.source: "icons/options.png"
+            icon.source: "images/icons/settings.png"
             flat: true
             Layout.alignment: Qt.AlignBottom
             Layout.fillWidth: true
             checkable: true
+            icon.color: iconColor
         }
         Button {
             text: "Log out"
-            icon.source: "icons/logout.png"
+            icon.source: "images/icons/logout.png"
             Layout.alignment: Qt.AlignBottom
             flat: true
             Layout.fillWidth: true
             onClicked: Qt.quit()
+            icon.color: iconColor
         }
 
+    }
+
+    Timer {
+        repeat: true
+        interval: 60 * 1000
+        onTriggered: {
+            load(accs);
+        }
     }
 
     function load(accs) {

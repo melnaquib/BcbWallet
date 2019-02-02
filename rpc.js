@@ -1,5 +1,6 @@
 .pragma library
 .import "accs.js" as Accs
+.import "AccBook.js" as AccBook
 
 
 function _rpc(args, cb){
@@ -18,7 +19,7 @@ function _rpc(args, cb){
 }
 
 function walletAccounts(wallet) {
-    console.log("DBG01");
+    console.log("DBG WALLET");
     console.log(wallet);
 
     var args = {
@@ -30,7 +31,7 @@ function walletAccounts(wallet) {
     for(var a in rsp.balances) {
         var o = rsp.balances[a];
         o.account = a;
-        o.name = a;
+        o.name = AccBook.getNameFromAcc(a);
         res.push(o);
     }
     return res;
@@ -45,7 +46,6 @@ function account_history(account) {
     }
 
     var res = _rpc(args);
-    console.log("H");
 
     res = res.history;
     for(var i in res) {
@@ -83,4 +83,62 @@ function send(account, amount) {
     }
 
     var res = _rpc(args);
+}
+
+function wallets(proxy) {
+    var r = proxy.nodeCmd("--wallet_list");
+    r = r.split(/\r?\n/);
+    var res = [];
+    for(var i in r) {
+        if(r[i].startsWith("Wallet ID: ")) {
+            var a = r[i].substr(11);
+            res.push(a);
+        }
+    }
+    return res;
+
+}
+
+function newWallet() {
+    var args = {
+        action: "wallet_create"
+    }
+
+    var res = _rpc(args);
+    return res.wallet;
+
+}
+
+function setSeed(wallet, seed) {
+    var args = {
+        action: "wallet_change_seed",
+        wallet: wallet,
+        seed: seed,
+        count :1
+    }
+
+    var res = _rpc(args);
+    ;
+}
+
+function setPasswd(wallet, passwd) {
+    var args = {
+        action: "password_change",
+        wallet: wallet,
+        password: passwd
+    }
+
+    var res = _rpc(args);
+    ;
+}
+
+function unlockWallet(wallet, passwd) {
+    var args = {
+        action: "password_enter",
+        wallet: wallet,
+        password: passwd
+    }
+
+    var res = _rpc(args);
+    return "1" == res.valid;
 }

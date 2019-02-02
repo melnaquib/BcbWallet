@@ -3,6 +3,7 @@ import QtQuick.Controls 2.4
 import QtQuick.Controls.Material 2.3
 import QtQuick.Layouts 1.3
 import Qt.labs.settings 1.0
+import QtGraphicalEffects 1.0
 
 import "rpc.js" as Rpc
 
@@ -11,29 +12,53 @@ ApplicationWindow {
     visible: true
     width: 800
     height: 600
+
+    property int ds: 20
+
     readonly property bool isPortrait: mainWin.width < mainWin.height
     property int spacing: 5
 
     property real cvrt: .1 //bcb to usd
 
-    property string wallet: settings.wallet
-    property alias themeLight: settings.light
+//    property string wallet
+    property string wallet: passDlg.wallet
+
+//    property alias themeLight: settings.light
+    property bool themeLight: false
 
     Material.theme: themeLight ? Material.Light : Material.Dark
     Material.accent: themeLight ? "#0688c9" : "yellow"
     Material.background: themeLight ? "#e6e6e6" : "#212121"
-    Material.foreground: Material.accent
-    Material.primary: themeLight ? "#f9f9f9" : "#000000"
+    Material.foreground: themeLight ? "black" : "yellow"
+    Material.primary: themeLight ? "#f9f9f9" : "#2f2f2f"
 
-    property int currAccIdx: 1
-//    property var accs: [{
-//            "name": "Daily Account", "balance": "0", "unit": "",
-//            "txs": []
-//        }, {
-//            "name": "Savings Account", "balance": "496", "unit": "M",
-//            "txs": []
-//        }]
+    background: Item {
+        Image {
+            id: bg
+            source: themeLight ? "": "images/bg.png"
+            anchors.fill: parent
 
+        }
+
+        BrightnessContrast {
+            anchors.fill: bg
+            source: bg
+            brightness: -0.8
+//            contrast: 0.9
+        }
+
+//        GammaAdjust {
+//               anchors.fill: bg
+//               source: bg
+//               gamma: 0.0
+//        }
+
+
+
+    }
+
+
+    property alias account: sidePanel.account
 
     property var accs
     onWalletChanged: {
@@ -41,33 +66,6 @@ ApplicationWindow {
         sidePanel.load(accs);
     }
 
-    RowLayout {
-        z:1
-        anchors.top: parent.top
-        anchors.left: parent.left
-//        height: day.implicitHeight
-        height: 20
-
-        CheckBox {
-            id: day
-            text: qsTr(checked ? "Day" : "Night")
-            z: 1
-            checked: true
-
-        }
-        Button {
-            text: qsTr("Wallet")
-            onClicked: walletDlg.open();
-        }
-    }
-
-
-    header: Header {
-        id: accHeader
-        x: sidePanel.width
-        width: parent.width - sidePanel.width
-
-    }
 
     SidePanel {
         id: sidePanel
@@ -76,43 +74,92 @@ ApplicationWindow {
         height: mainWin.height
 
         onAccountChanged: {
-            accHeader.loadAcc(account);
+            accHeader.loadAcc(accs, account);
             txsPage.loadAcc(account);
         }
     }
 
-    StackView {
-        id: stackView
-
-         anchors.leftMargin: 5 + !isPortrait ? sidePanel.width : undefined
-
-//        initialItem: "HomeForm.ui.qml"
-        initialItem: sidePanel.settingsSelected ? settingsPage : txsPage
-
-        Txs {
-            id: txsPage
-            padding: 10
-//            account: sidePanel.account
-            visible: !sidePanel.settingsSelected
+    header: BorderRect {
+        id: headerBox
+        x: sidePanel.width
+        width: parent.width - sidePanel.width
+        height: childrenRect.height + 20
+        Header {
+            id: accHeader
+            x: ds
+            width: parent.width - 2 * x
+            anchors.verticalCenter: parent.verticalCenter
         }
+    }
 
-        SettingsPage {
-            id: settingsPage
-            wallet: "884F248258C9EB8843F88AA25A261DEC7F16491F7FCE5CCB69126112ED28253C"
-            visible: sidePanel.settingsSelected
-
-        }
-
+    BorderRect {
+//        anchors.left: sidePanel.right
+        x: sidePanel.width + ds
+        anchors.leftMargin: 5 + !isPortrait ? sidePanel.width : undefined
+        anchors.topMargin: 0-ds
         anchors.fill: parent
+
+        StackView {
+            id: stackView
+            anchors.fill: parent
+
+//            width: parent.width - sidePanel.width
+//            height: childrenRect.height
+//            anchors.leftMargin: 5 + !isPortrait ? sidePanel.width : undefined
+            anchors.margins: 20
+
+    //        initialItem: "HomeForm.ui.qml"
+            initialItem: sidePanel.settingsSelected ? settingsPage : txsPage
+
+            Txs {
+                id: txsPage
+                padding: ds
+    //            account: sidePanel.account
+                visible: !sidePanel.settingsSelected
+            }
+
+            SettingsPage {
+                id: settingsPage
+                wallet: "884F248258C9EB8843F88AA25A261DEC7F16491F7FCE5CCB69126112ED28253C"
+                visible: sidePanel.settingsSelected
+
+            }
+        }
     }
 
-    Settings {id: settings
-        property alias wallet: settingsPage.wallet
-        property alias light: settingsPage.light
+//    StartDialog {
+//        id: startDlg
+
+//        height: parent.height
+//        width: parent.width
+
+//        Component.onCompleted: {
+//            startDlg.open();
+//        }
+//    }
+
+    Component.onCompleted: {
+        passDlg.open();
     }
 
-    background: Image {
-        id: bg
-        source: "images/bg.png"
+    function setup() {
+        if (! wallet) {
+            newWallet();
+        }
     }
+
+    function newWallet() {
+        Rpc.newWallet;
+    }
+
+    PassDlg {
+        id: passDlg
+        width: parent.width
+        height: parent.height
+
+//        property bool newSeed: !wallet
+        newSeed: true
+    }
+
+
 }

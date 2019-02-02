@@ -14,5 +14,10 @@
         <file>SidePanel.qml</file>
         <file>SendDialog.qml</file>
         <file>SettingsPage.qml</file>
+        <file>BorderRect.qml</file>
+        <file>AccountsPage.qml</file>
+        <file>AccBook.js</file>
+        <file>StartDialog.qml</file>
+        <file>PassDlg.qml</file>
     </qresource>
 </RCC>
